@@ -1,1 +1,1 @@
-# petzy
+# Petzy Companion
