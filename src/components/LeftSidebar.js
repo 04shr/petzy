@@ -39,7 +39,7 @@ const LeftSidebar = () => {
         {navItems.map((item, index) => (
           <li key={index}>
             <a 
-              href="#" 
+            
               className="nav-link-hover flex items-center p-3 text-white rounded-xl transition-all duration-300 bg-white bg-opacity-5 border border-transparent hover:transform hover:translate-x-2 hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-400/30 font-semibold text-sm relative overflow-hidden"
             >
               <span className="mr-3 text-base">{item.icon}</span>

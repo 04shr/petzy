@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import PetModel from './PetModel';
 
 const MainContent = () => {
   const [currentZone, setCurrentZone] = useState('fun');
   const [notification, setNotification] = useState('');
+  const petRef = useRef(); // ✅ ref for PetModel
 
   const zoneActions = {
     fun: [
@@ -56,14 +58,11 @@ const MainContent = () => {
       </header>
 
       {/* Pet Showcase */}
-      <section className="flex-1 bg-white bg-opacity-10 backdrop-blur-3xl rounded-3xl border border-white border-opacity-20 p-8 text-center relative overflow-hidden mb-4 flex flex-col justify-center items-center">
-        <div className="pet-model-border w-44 h-44 bg-gradient-to-br from-indigo-500 via-purple-500 to-indigo-600 rounded-full mb-6 flex items-center justify-center text-7xl animate-float shadow-2xl shadow-indigo-500/40 relative">
-          🐕
-        </div>
-        <div className="text-3xl font-bold text-white mb-6 text-shadow-md">
-          Max the Legend
-        </div>
-      </section>
+    <section className="flex flex-col items-center p-4">
+  <div className="w-full max-w-xs aspect-square">
+    <PetModel ref={petRef} modelPath="/models/mouth.glb" className="w-full h-full object-contain" />
+  </div>
+</section>
 
       {/* Zone Toggle Button */}
       <div className="flex justify-center mb-6">

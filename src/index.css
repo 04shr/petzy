@@ -60,3 +60,12 @@
   from { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
   to { transform: translate(-50%, -50%) scale(0.8) rotate(10deg); opacity: 0; }
 }
+
+.pet-container {
+  display: flex;
+  justify-content: center; /* centers horizontally */
+  align-items: center;     /* centers vertically */
+  height: 100vh;           /* full screen height */
+  width: 100%;             /* full width */
+  position: relative;
+}
