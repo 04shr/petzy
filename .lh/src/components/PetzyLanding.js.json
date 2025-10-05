@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1759645032379,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1759650290479,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -94,16 +94,8 @@\n           }\r\n         ])\r\n   ];\r\n \r\n-  useEffect(() => {\r\n-    if (showStory && storyTexts[storyStep]?.input && inputRef.current) {\r\n-      const timer = setTimeout(() => {\r\n-        inputRef.current?.focus();\r\n-      }, 100);\r\n-      return () => clearTimeout(timer);\r\n-    }\r\n-  }, [storyStep, showStory]);\r\n \r\n   const nextStep = async () => {\r\n   const currentStory = storyTexts[storyStep];\r\n \r\n"
                 }
             ],
             "date": 1759645032379,

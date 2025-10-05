@@ -1,40 +1,29 @@
+// usePreferences.js
 import { useState, useEffect } from "react";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { db, auth } from "../firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db, auth } from "../firebase"; // make sure Firebase is initialized
 
 export const usePreferences = () => {
   const [preferences, setPreferences] = useState({
-    meshes: [],
-    currentScene: null,
+    meshes: [],         // array of {name, color}
+    currentScene: null, // {name, img}
   });
-//hello
-  const [userId, setUserId] = useState(null);
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) setUserId(user.uid);
-    });
-    return unsubscribe;
-  }, []);
+  const userId = auth.currentUser?.uid;
 
+  // Load preferences from Firestore on login
   useEffect(() => {
     if (!userId) return;
 
     const fetchPreferences = async () => {
       try {
-        const userDocRef = doc(db, "users", userId);
-        const docSnap = await getDoc(userDocRef);
-
+        const docRef = doc(db, "preferences", userId);
+        const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          const userData = docSnap.data();
-          setPreferences(userData.preferences || { meshes: [], currentScene: null });
-        } else {
-          // always use setDoc to create new doc
-          await setDoc(userDocRef, { preferences: { meshes: [], currentScene: null } });
-          setPreferences({ meshes: [], currentScene: null });
+          setPreferences(docSnap.data());
         }
       } catch (err) {
-        console.error("Error fetching preferences:", err);
+        console.error("Failed to fetch preferences:", err);
       }
     };
 
@@ -42,16 +31,15 @@ export const usePreferences = () => {
   }, [userId]);
 
   const updatePreferences = async (newPrefs) => {
-    setPreferences((prev) => {
-      const updated = { ...prev, ...newPrefs };
-      if (!userId) return updated;
+    setPreferences((prev) => ({ ...prev, ...newPrefs }));
 
-      const userDocRef = doc(db, "users", userId);
-      // always use setDoc with merge for updates
-      setDoc(userDocRef, { preferences: updated }, { merge: true }).catch(console.error);
-
-      return updated;
-    });
+    if (!userId) return;
+    try {
+      const docRef = doc(db, "preferences", userId);
+      await setDoc(docRef, { ...preferences, ...newPrefs });
+    } catch (err) {
+      console.error("Failed to update preferences:", err);
+    }
   };
 
   return [preferences, updatePreferences];

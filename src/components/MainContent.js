@@ -117,17 +117,20 @@ useEffect(() => {
   fetchMeshes();
 }, [activePanel]);
 
+// In your handleDrop for feeding
+const handleDrop = (e) => {
+    e.preventDefault();
+    const food = e.dataTransfer.getData("food");
+    if (food) {
+        showNotification(`Your pet enjoyed the ${food}! 😋`);
+        setActivePanel(null);
 
-    const handleDrop = (e) => {
-  e.preventDefault();
-  const food = e.dataTransfer.getData("food");
-  if (food) {
-    showNotification(`Your pet enjoyed the ${food}! 😋`);
-    setActivePanel(null);
-
-    // Save to preferences
-    updatePreferences({ lastFed: food });
-  }
+        // Update preferences: increment fedCount and save last fed food
+        updatePreferences({
+            stats: { fedCount: (preferences.stats?.fedCount || 0) + 1 },
+            lastFed: food
+        });
+    }
 };
 
 
@@ -277,21 +280,7 @@ const resetMeshToDefault = (meshName) => {
                                         {food.name}
                                     </div>
                                 ))}
-                          {activePanel === "play" &&
-  gameOptions.map((game, i) => (
-    <a
-      key={i}
-      href={game.link}
-      onClick={() => {
-        setActivePanel(null);
-        updatePreferences({ lastPlayedGame: game.name });
-      }}
-      className="flex flex-col items-center justify-center gap-1 cursor-pointer text-white text-center p-2 rounded-lg bg-white/10 hover:bg-green-500/30 transition-all duration-200"
-    >
-      <span className="text-2xl">{game.icon}</span>
-      <span className="text-xs">{game.name}</span>
-    </a>
-  ))}
+
 
                             {/* guard: show message if array empty */}
                             {activePanel === "play" && gameOptions.length === 0 && (

@@ -95,14 +95,14 @@ const PetzyLanding = ({ setIsAuthenticated }) => {
         ])
   ];
 
-  useEffect(() => {
+useEffect(() => {
     if (showStory && storyTexts[storyStep]?.input && inputRef.current) {
-      const timer = setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
-      return () => clearTimeout(timer);
+        const timer = setTimeout(() => {
+            inputRef.current?.focus();
+        }, 100);
+        return () => clearTimeout(timer);
     }
-  }, [storyStep, showStory]);
+}, [storyStep, showStory, storyTexts]);
 
   const nextStep = async () => {
   const currentStory = storyTexts[storyStep];

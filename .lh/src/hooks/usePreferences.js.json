@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1759638644750,
@@ -16,6 +16,10 @@
                 {
                     "date": 1759638716216,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,9 +6,9 @@\n   const [preferences, setPreferences] = useState({\r\n     meshes: [],\r\n     currentScene: null,\r\n   });\r\n-\r\n+//hello\r\n   const [userId, setUserId] = useState(null);\r\n \r\n   useEffect(() => {\r\n     const unsubscribe = auth.onAuthStateChanged((user) => {\r\n"
+                },
+                {
+                    "date": 1759649684352,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,53 +25,38 @@\n   useEffect(() => {\r\n     const unsubscribe = auth.onAuthStateChanged(async (user) => {\r\n       if (!user) return;\r\n \r\n+      // IMPORTANT: make sure user.displayName exists\r\n       if (!user.displayName) {\r\n         console.error(\"User must have a username!\");\r\n         return;\r\n       }\r\n \r\n-      const username = user.displayName;\r\n-      const secretKey = \"123\"; // your logic for secret key\r\n+      const username = user.displayName; // <-- use this as doc ID\r\n+      const secretKey = \"123\"; // or your logic\r\n \r\n-      setUserInfo((prev) => ({ ...prev, username, secretKey }));\r\n+      setUserInfo({ username, secretKey, petname: null });\r\n \r\n-      const userDocRef = doc(db, \"users\", username);\r\n+      const userDocRef = doc(db, \"users\", username); // <-- ONE doc\r\n       const docSnap = await getDoc(userDocRef);\r\n \r\n       if (docSnap.exists()) {\r\n         const data = docSnap.data();\r\n-\r\n-        // Ensure preferences always exists\r\n-        const existingPrefs = data.preferences || {\r\n-          meshes: [],\r\n-          currentScene: null,\r\n-          stats: {},\r\n-          lastFed: null,\r\n-          lastPlayedGame: null,\r\n-        };\r\n-\r\n-        setPreferences(existingPrefs);\r\n-\r\n+        setPreferences(data.preferences || preferences);\r\n         setUserInfo({\r\n           username: data.username,\r\n           secretKey: data.secretKey,\r\n-          petname: data.petname || generatePetName(),\r\n+          petname: data.petname,\r\n         });\r\n-\r\n-        // If preferences field was missing, set it in Firestore\r\n-        if (!data.preferences) {\r\n-          await updateDoc(userDocRef, { preferences: existingPrefs });\r\n-        }\r\n       } else {\r\n         const defaultPetName = generatePetName();\r\n         const defaultPrefs = {\r\n-          meshes: [],\r\n           currentScene: null,\r\n-          stats: {},\r\n           lastFed: null,\r\n           lastPlayedGame: null,\r\n+          meshes: [],\r\n+          stats: {},\r\n         };\r\n \r\n         await setDoc(userDocRef, {\r\n           username,\r\n@@ -93,14 +78,10 @@\n \r\n     const userDocRef = doc(db, \"users\", userInfo.username);\r\n     const updatedPrefs = { ...preferences, ...newPrefs };\r\n \r\n-    try {\r\n-      await updateDoc(userDocRef, { preferences: updatedPrefs });\r\n-      setPreferences(updatedPrefs);\r\n-    } catch (err) {\r\n-      console.error(\"Failed to update preferences:\", err);\r\n-    }\r\n+    await updateDoc(userDocRef, { preferences: updatedPrefs }).catch(console.error);\r\n+    setPreferences(updatedPrefs);\r\n   };\r\n \r\n   return [preferences, updatePreferences, userInfo];\r\n };\r\n"
                 }
             ],
             "date": 1759638644750,
