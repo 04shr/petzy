@@ -3,44 +3,26 @@ import React, { useState, useRef, useEffect } from "react";
 import { Mic, Send, Square } from "lucide-react";
 // --- Text-to-Speech helper ---
 // --- Text-to-Speech helper with mouth animation ---
+
 const speakText = (text, petRef) => {
   if (!window.speechSynthesis) return;
 
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "en-US";
-
-  let interval;
-  let open = false;
 
   utterance.onstart = () => {
-    if (!petRef?.current) return;
-
-    // Toggle mouth and optional head motion
-    const intervalTime = Math.max(80, 300 - text.length * 2); // faster for longer text
-    interval = setInterval(() => {
-      if (petRef.current.setMouthOpen) {
-        open = !open; // toggle open/close
-        petRef.current.setMouthOpen(open);
-      }
-
-      // Optional: subtle head sway for realism
-      if (petRef.current.group) {
-        petRef.current.group.rotation.y = Math.sin(Date.now() / 300) * 0.05;
-      }
-    }, intervalTime);
+    if (petRef.current?.startSpeaking) {
+      petRef.current.startSpeaking();
+    }
   };
 
   utterance.onend = () => {
-    clearInterval(interval);
-
-    // Reset mouth and head
-    if (petRef?.current?.setMouthOpen) petRef.current.setMouthOpen(false);
-    if (petRef?.current?.group) petRef.current.group.rotation.y = 0;
+    if (petRef.current?.stopSpeaking) {
+      petRef.current.stopSpeaking();
+    }
   };
 
   window.speechSynthesis.speak(utterance);
 };
-
 
 // --- Right Sidebar Component ---
 export default function RightSidebar({ petRef }) {

@@ -11,6 +11,7 @@ const PetzyLanding = ({ setIsAuthenticated }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [isReturningUser, setIsReturningUser] = useState(false);
   const inputRef = useRef(null);
+  const [currentUsername, setCurrentUsername] = useState('');
 
  const checkIfUserExists = async (username) => {
     try {
@@ -107,27 +108,30 @@ const PetzyLanding = ({ setIsAuthenticated }) => {
   const currentStory = storyTexts[storyStep];
 
   if (storyStep === storyTexts.length - 1) {
-    if (isReturningUser) {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', userInfo.username.toLowerCase()));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          if (userData.secretKey === userInfo.secretKey) {
-            setIsAuthenticated?.(true);
-          } else {
-            alert("Incorrect magical key. Please try again.");
-          }
+  if (isReturningUser) {
+    try {
+      const userDoc = await getDoc(doc(db, 'users', userInfo.username.toLowerCase()));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData.secretKey === userInfo.secretKey) {
+          setCurrentUsername(userInfo.username); // <-- add this
+          setIsAuthenticated?.(true);
         } else {
-          alert("User not found.");
+          alert("Incorrect magical key. Please try again.");
         }
-      } catch (error) {
-        console.error("Error verifying user:", error);
+      } else {
+        alert("User not found.");
       }
-    } else {
-      await saveNewUser(userInfo);
-      setIsAuthenticated?.(true);
+    } catch (error) {
+      console.error("Error verifying user:", error);
     }
   } else {
+    await saveNewUser(userInfo);
+    setCurrentUsername(userInfo.username); // <-- add this
+    setIsAuthenticated?.(true);
+  }
+}
+ else {
     setIsTyping(true);
     setTimeout(() => {
       setStoryStep((prev) => prev + 1);

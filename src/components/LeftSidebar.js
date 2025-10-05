@@ -1,20 +1,68 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
+import { usePreferences } from "../hooks/usePreferences";
 
-const LeftSidebar = () => {
+const LeftSidebar = ({ dailyActions }) => {
+  const [preferences, updatePreferences] = usePreferences();
+
   const navItems = [
-    { icon: '🏠', name: 'Home Base' },
-    { icon: '📊', name: 'Dashboard' },
-    { icon: '🏆', name: 'Achievements' },
-    { icon: '📈', name: 'Progress' },
-    { icon: '🎯', name: 'Challenges' },
-    { icon: '⚙️', name: 'Settings' }
+    { icon: "🏠", name: "Home Base" },
+    { icon: "⚙️", name: "Settings" },
   ];
 
+  // Daily action counters
+  const [dailyLog, setDailyLog] = useState({
+    feed: 0,
+    play: 0,
+    groom: 0,
+    rest: 0,
+  });
+
+  // Dynamically calculate stats
+  const computeStats = (log) => {
+    const stats = {};
+
+    // Hunger: 0-100, +20 per feed, max 100
+    stats.hunger = Math.min(100, log.feed * 20);
+    // Happiness: +25 per play
+    stats.happiness = Math.min(100, log.play * 25);
+    // Energy: starts 100, -15 per play, +10 per feed, +20 per rest
+    stats.energy = Math.max(0, Math.min(100, 100 - log.play * 15 + log.feed * 10 + log.rest * 20));
+    // Love: +15 per groom
+    stats.love = Math.min(100, log.groom * 15);
+    // XP: +10 per action
+    stats.xp = Math.min(100, (log.feed + log.play + log.groom + log.rest) * 10);
+    // Streak: 1 if minimum daily requirements met, else 0
+    stats.streak = log.feed >= 3 && log.play >= 4 ? 1 : 0;
+
+    return stats;
+  };
+
+  // Update dailyLog whenever actions happen
+  useEffect(() => {
+    if (!dailyActions || !dailyActions.length) return;
+
+    const newLog = { ...dailyLog };
+    dailyActions.forEach((action) => {
+      if (newLog[action] !== undefined) {
+        newLog[action] += 1;
+      }
+    });
+
+    setDailyLog(newLog);
+  }, [dailyActions]);
+
+  // Update preferences whenever dailyLog changes
+  useEffect(() => {
+    const stats = computeStats(dailyLog);
+    updatePreferences({ stats });
+  }, [dailyLog]);
+
+  const stats = computeStats(dailyLog);
+
   return (
-    <aside className="w-72 bg-black bg-opacity-40 backdrop-blur-3xl border-r-2 border-white border-opacity-20 p-4 relative overflow-y-auto">
-      {/* Top gradient line */}
+    <aside className="w-72 h-screen bg-black bg-opacity-40 backdrop-blur-3xl border-r-2 border-white border-opacity-20 p-4 relative overflow-y-auto no-scrollbar">
       <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 animate-pulse-slow"></div>
-      
+
       {/* Logo */}
       <div className="text-center mb-6 relative">
         <span className="text-4xl block mb-2 animate-bounce-slow">🐶</span>
@@ -22,32 +70,39 @@ const LeftSidebar = () => {
           Petzy
         </h1>
       </div>
-      
-      {/* User Profile */}
-      <div className="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl border border-white border-opacity-20 p-4 mb-4 text-center">
-        <div className="w-15 h-15 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full mx-auto mb-2 flex items-center justify-center text-2xl animate-pulse-slow">
-          🎮
-        </div>
-        <div className="text-white font-bold text-lg mb-1">Champion Player</div>
-        <div className="bg-gradient-to-r from-pink-400 to-red-400 text-white px-3 py-1 rounded-full text-sm font-semibold">
-          Level 42 Master
+
+      {/* Pet Status Panel */}
+      <div className="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl border border-white border-opacity-20 p-4 mb-4 text-white">
+        <h2 className="font-bold text-lg mb-3 text-center">🐾 Pet Status</h2>
+        <div className="space-y-4">
+          {Object.entries(stats).map(([key, value], idx) => (
+            <div key={idx}>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="capitalize">{key}</span>
+                <span>{key === "streak" ? value : `${value}%`}</span>
+              </div>
+              {key !== "streak" && (
+                <div className="w-full h-2 bg-white bg-opacity-20 rounded-full overflow-hidden">
+                  <div
+                    className={`h-2 rounded-full ${
+                      key === "hunger"
+                        ? "bg-yellow-400"
+                        : key === "happiness"
+                        ? "bg-green-400"
+                        : key === "energy"
+                        ? "bg-blue-400"
+                        : key === "love"
+                        ? "bg-pink-400"
+                        : "bg-orange-400"
+                    }`}
+                    style={{ width: `${value}%` }}
+                  ></div>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
-      
-      {/* Navigation Menu */}
-      <ul className="space-y-3">
-        {navItems.map((item, index) => (
-          <li key={index}>
-            <a 
-            
-              className="nav-link-hover flex items-center p-3 text-white rounded-xl transition-all duration-300 bg-white bg-opacity-5 border border-transparent hover:transform hover:translate-x-2 hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-400/30 font-semibold text-sm relative overflow-hidden"
-            >
-              <span className="mr-3 text-base">{item.icon}</span>
-              <span>{item.name}</span>
-            </a>
-          </li>
-        ))}
-      </ul>
     </aside>
   );
 };

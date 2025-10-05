@@ -26,13 +26,13 @@ function App() {
         <div className="grid grid-cols-[290px_1fr_290px] h-screen gap-0">
           <LeftSidebar />
 
-          {/* Middle column: MainContent + PetModel */}
-        <div className="relative flex flex-col items-center justify-center">
-  <MainContent />
-  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-    <PetModel ref={petRef} className="w-100 h-100" />
-  </div>
-</div>
+          <div className="relative w-full h-full">
+            {/* ✅ Add PetModel here and attach ref */}
+            <PetModel ref={petRef} className="absolute inset-0" />
+
+            <MainContent />
+          </div>
+
           {/* Pass petRef so RightSidebar can control mouth */}
           <RightSidebar petRef={petRef} />
         </div>

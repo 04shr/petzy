@@ -9,5 +9,6 @@
   },
   "editor.quickSuggestions": {
     "strings": true
-  }
+  },
+  "local-history.browser.descending": true
 }
