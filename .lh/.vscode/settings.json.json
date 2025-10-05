@@ -1,0 +1,18 @@
+{
+    "sourceFile": ".vscode/settings.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1759638682683,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1759638682683,
+            "name": "Commit-0",
+            "content": "{\r\n  \"css.validate\": false,\r\n  \"less.validate\": false,\r\n  \"scss.validate\": false,\r\n  \"tailwindCSS.includeLanguages\": {\r\n    \"html\": \"html\",\r\n    \"javascript\": \"javascript\",\r\n    \"css\": \"css\"\r\n  },\r\n  \"editor.quickSuggestions\": {\r\n    \"strings\": true\r\n  },\r\n  \"local-history.browser.descending\": false\r\n}"
+        }
+    ]
+}

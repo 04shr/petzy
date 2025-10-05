@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/hooks/usePreferences.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1759638644750,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1759638707217,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,9 +5,9 @@\n export const usePreferences = () => {\r\n   const [preferences, setPreferences] = useState({\r\n     meshes: [],\r\n     currentScene: null,\r\n-  });\r\n+  })\r\n \r\n   const [userId, setUserId] = useState(null);\r\n \r\n   useEffect(() => {\r\n"
+                },
+                {
+                    "date": 1759638716216,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,9 +6,9 @@\n   const [preferences, setPreferences] = useState({\r\n     meshes: [],\r\n     currentScene: null,\r\n   });\r\n-\r\n+//hello\r\n   const [userId, setUserId] = useState(null);\r\n \r\n   useEffect(() => {\r\n     const unsubscribe = auth.onAuthStateChanged((user) => {\r\n"
+                }
+            ],
+            "date": 1759638644750,
+            "name": "Commit-0",
+            "content": "import { useState, useEffect } from \"react\";\r\nimport { doc, getDoc, setDoc, updateDoc } from \"firebase/firestore\";\r\nimport { db, auth } from \"../firebase\";\r\n\r\nexport const usePreferences = () => {\r\n  const [preferences, setPreferences] = useState({\r\n    meshes: [],\r\n    currentScene: null,\r\n  });\r\n\r\n  const [userId, setUserId] = useState(null);\r\n\r\n  useEffect(() => {\r\n    const unsubscribe = auth.onAuthStateChanged((user) => {\r\n      if (user) setUserId(user.uid);\r\n    });\r\n    return unsubscribe;\r\n  }, []);\r\n\r\n  useEffect(() => {\r\n    if (!userId) return;\r\n\r\n    const fetchPreferences = async () => {\r\n      try {\r\n        const userDocRef = doc(db, \"users\", userId);\r\n        const docSnap = await getDoc(userDocRef);\r\n\r\n        if (docSnap.exists()) {\r\n          const userData = docSnap.data();\r\n          setPreferences(userData.preferences || { meshes: [], currentScene: null });\r\n        } else {\r\n          // always use setDoc to create new doc\r\n          await setDoc(userDocRef, { preferences: { meshes: [], currentScene: null } });\r\n          setPreferences({ meshes: [], currentScene: null });\r\n        }\r\n      } catch (err) {\r\n        console.error(\"Error fetching preferences:\", err);\r\n      }\r\n    };\r\n\r\n    fetchPreferences();\r\n  }, [userId]);\r\n\r\n  const updatePreferences = async (newPrefs) => {\r\n    setPreferences((prev) => {\r\n      const updated = { ...prev, ...newPrefs };\r\n      if (!userId) return updated;\r\n\r\n      const userDocRef = doc(db, \"users\", userId);\r\n      // always use setDoc with merge for updates\r\n      setDoc(userDocRef, { preferences: updated }, { merge: true }).catch(console.error);\r\n\r\n      return updated;\r\n    });\r\n  };\r\n\r\n  return [preferences, updatePreferences];\r\n};\r\n"
+        }
+    ]
+}
