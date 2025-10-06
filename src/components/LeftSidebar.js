@@ -1,5 +1,6 @@
+// src/components/LeftSidebar.js
 import React, { useState, useEffect } from "react";
-import { usePreferences } from "../hooks/usePreferences";
+import usePreferences from "../hooks/usePreferences"; // <-- default import (fixed)
 
 const LeftSidebar = ({ dailyActions }) => {
   const [preferences, updatePreferences] = usePreferences();
@@ -22,17 +23,27 @@ const LeftSidebar = ({ dailyActions }) => {
     const stats = {};
 
     // Hunger: 0-100, +20 per feed, max 100
-    stats.hunger = Math.min(100, log.feed * 20);
+    stats.hunger = Math.min(100, (log.feed || 0) * 20);
     // Happiness: +25 per play
-    stats.happiness = Math.min(100, log.play * 25);
+    stats.happiness = Math.min(100, (log.play || 0) * 25);
     // Energy: starts 100, -15 per play, +10 per feed, +20 per rest
-    stats.energy = Math.max(0, Math.min(100, 100 - log.play * 15 + log.feed * 10 + log.rest * 20));
+    stats.energy = Math.max(
+      0,
+      Math.min(
+        100,
+        100 - (log.play || 0) * 15 + (log.feed || 0) * 10 + (log.rest || 0) * 20
+      )
+    );
     // Love: +15 per groom
-    stats.love = Math.min(100, log.groom * 15);
+    stats.love = Math.min(100, (log.groom || 0) * 15);
     // XP: +10 per action
-    stats.xp = Math.min(100, (log.feed + log.play + log.groom + log.rest) * 10);
+    stats.xp = Math.min(
+      100,
+      ((log.feed || 0) + (log.play || 0) + (log.groom || 0) + (log.rest || 0)) *
+        10
+    );
     // Streak: 1 if minimum daily requirements met, else 0
-    stats.streak = log.feed >= 3 && log.play >= 4 ? 1 : 0;
+    stats.streak = (log.feed || 0) >= 3 && (log.play || 0) >= 4 ? 1 : 0;
 
     return stats;
   };
@@ -54,8 +65,13 @@ const LeftSidebar = ({ dailyActions }) => {
   // Update preferences whenever dailyLog changes
   useEffect(() => {
     const stats = computeStats(dailyLog);
-    updatePreferences({ stats });
-  }, [dailyLog]);
+
+    // merge existing stats (to avoid wiping other nested preference keys)
+    const mergedStats = { ...(preferences.stats || {}), ...stats };
+
+    // update both stats and dailyLog in preferences
+    updatePreferences({ stats: mergedStats, dailyLog });
+  }, [dailyLog]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const stats = computeStats(dailyLog);
 
@@ -96,7 +112,7 @@ const LeftSidebar = ({ dailyActions }) => {
                         : "bg-orange-400"
                     }`}
                     style={{ width: `${value}%` }}
-                  ></div>
+                  />
                 </div>
               )}
             </div>
